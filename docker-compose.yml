@@ -28,7 +28,7 @@ services:
     depends_on:
       - backend
     environment:
-      - REACT_APP_API_URL=http://localhost:8000/api
+      - VITE_API_URL=http://localhost:8000/api
     stdin_open: true
     command: npm start
 

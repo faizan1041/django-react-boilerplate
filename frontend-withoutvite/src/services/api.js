@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
+  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8000/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -38,7 +38,7 @@ export const userService = {
     delete: (id) => api.delete(`/users/${id}/`),
     setGroups: (id, groups) => api.post(`/users/${id}/set_groups/`, { groups }),
     setPermissions: (id, permissions) => api.post(`/users/${id}/set_permissions/`, { permissions }),
-    setPassword: (id, password) => api.post(`/users/${id}/set_password/`, { password })
+    setPassword: (id, password) => api.post(`/users/${id}/set_password/`, { password }) // New method
 };
 
 export const groupService = {

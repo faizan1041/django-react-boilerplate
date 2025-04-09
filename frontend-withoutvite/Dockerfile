@@ -10,7 +10,7 @@ RUN addgroup -g 1001 -S nodejs && \
 # Copy package files
 COPY package.json ./
 
-# Install dependencies
+# Use npm install instead of npm ci since package-lock.json might not exist
 RUN npm install && \
     mkdir -p node_modules/.cache && \
     chmod -R 777 node_modules/.cache
@@ -18,18 +18,9 @@ RUN npm install && \
 # Copy application code
 COPY . .
 
-# Build the app
-RUN npm run build
+# Switch to non-root user
+USER nodeuser
 
-# Use a lightweight nginx image to serve the static files
-FROM nginx:alpine
+EXPOSE 3000
 
-# Copy the built app from the previous stage
-COPY --from=0 /app/dist /usr/share/nginx/html
-
-# Configure nginx
-COPY ./nginx.conf /etc/nginx/conf.d/default.conf
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npm", "start"]
