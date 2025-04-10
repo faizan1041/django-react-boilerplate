@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 import { authService } from '../services/api';
 
 const Profile = () => {
-  const { user, refreshAccessToken } = useAuth();
+  const { currentUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [updateSuccess, setUpdateSuccess] = useState(false);
@@ -13,9 +13,9 @@ const Profile = () => {
 
   const formik = useFormik({
     initialValues: {
-      first_name: user?.first_name || '',
-      last_name: user?.last_name || '',
-      email: user?.email || '',
+      first_name: currentUser?.first_name || '',
+      last_name: currentUser?.last_name || '',
+      email: currentUser?.email || '',
       current_password: '',
       new_password: '',
       re_new_password: '',
@@ -64,9 +64,6 @@ const Profile = () => {
           formik.setFieldValue('re_new_password', '');
         }
         
-        // Refresh user data
-        await refreshAccessToken();
-        
         setUpdateSuccess(true);
         setIsEditing(false);
       } catch (err) {
@@ -81,9 +78,9 @@ const Profile = () => {
     // Reset form with current user data
     formik.resetForm({
       values: {
-        first_name: user?.first_name || '',
-        last_name: user?.last_name || '',
-        email: user?.email || '',
+        first_name: currentUser?.first_name || '',
+        last_name: currentUser?.last_name || '',
+        email: currentUser?.email || '',
         current_password: '',
         new_password: '',
         re_new_password: '',
@@ -99,7 +96,7 @@ const Profile = () => {
     setError(null);
   };
 
-  if (!user) {
+  if (!currentUser) {
     return (
       <div className="text-center py-10">
         <p className="text-gray-500">Loading user data...</p>
@@ -301,20 +298,20 @@ const Profile = () => {
             <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
               <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500">First name</dt>
-                <dd className="mt-1 text-sm text-gray-900">{user.first_name}</dd>
+                <dd className="mt-1 text-sm text-gray-900">{currentUser.first_name}</dd>
               </div>
               <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500">Last name</dt>
-                <dd className="mt-1 text-sm text-gray-900">{user.last_name}</dd>
+                <dd className="mt-1 text-sm text-gray-900">{currentUser.last_name}</dd>
               </div>
               <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500">Email address</dt>
-                <dd className="mt-1 text-sm text-gray-900">{user.email}</dd>
+                <dd className="mt-1 text-sm text-gray-900">{currentUser.email}</dd>
               </div>
               <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500">Account status</dt>
                 <dd className="mt-1 text-sm text-gray-900">
-                  {user.is_active ? (
+                  {currentUser.is_active ? (
                     <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                       Active
                     </span>
@@ -328,21 +325,21 @@ const Profile = () => {
               <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500">User role</dt>
                 <dd className="mt-1 text-sm text-gray-900">
-                  {user.is_staff ? 'Administrator' : 'Regular User'}
+                  {currentUser.is_staff ? 'Administrator' : 'Regular User'}
                 </dd>
               </div>
               <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500">Date joined</dt>
                 <dd className="mt-1 text-sm text-gray-900">
-                  {new Date(user.date_joined).toLocaleDateString()}
+                  {new Date(currentUser.date_joined).toLocaleDateString()}
                 </dd>
               </div>
               <div className="sm:col-span-2">
                 <dt className="text-sm font-medium text-gray-500">Groups</dt>
                 <dd className="mt-1 text-sm text-gray-900">
-                  {user.groups && user.groups.length > 0 ? (
+                  {currentUser.groups && currentUser.groups.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
-                      {user.groups.map((group) => (
+                      {currentUser.groups.map((group) => (
                         <span key={group.id} className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-blue-100 text-blue-800">
                           {group.name}
                         </span>

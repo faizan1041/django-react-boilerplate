@@ -20,9 +20,12 @@ services:
 
   frontend:
     build: ./frontend
+    user: node
     volumes:
       - ./frontend:/app
       - frontend-node-modules:/app/node_modules
+      # Don't mount these specific files/directories from host
+      - /app/node_modules/.vite
     ports:
       - "3000:3000"
     depends_on:
@@ -30,7 +33,7 @@ services:
     environment:
       - VITE_API_URL=http://localhost:8000/api
     stdin_open: true
-    command: npm start
+    command: npm run dev
 
   db:
     image: postgres:13

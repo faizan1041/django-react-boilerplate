@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { currentUser } = useAuth();
 
   return (
     <div className="bg-white shadow overflow-hidden sm:rounded-lg">
@@ -44,7 +44,7 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {user?.is_staff && (
+            {currentUser?.is_staff && (
               <>
                 <div className="bg-white overflow-hidden shadow rounded-lg">
                   <div className="px-4 py-5 sm:p-6">
@@ -109,7 +109,7 @@ const Dashboard = () => {
               <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
                 <dt className="text-sm font-medium text-gray-500">User Status</dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {user?.is_active ? (
+                  {currentUser?.is_active ? (
                     <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                       Active
                     </span>
@@ -123,13 +123,13 @@ const Dashboard = () => {
               <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
                 <dt className="text-sm font-medium text-gray-500">User Role</dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {user?.is_staff ? 'Administrator' : 'Regular User'}
+                  {currentUser?.is_staff ? 'Administrator' : 'Regular User'}
                 </dd>
               </div>
               <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
                 <dt className="text-sm font-medium text-gray-500">Last Login</dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {user?.last_login ? new Date(user.last_login).toLocaleString() : 'N/A'}
+                  {currentUser?.last_login ? new Date(currentUser.last_login).toLocaleString() : 'N/A'}
                 </dd>
               </div>
             </dl>

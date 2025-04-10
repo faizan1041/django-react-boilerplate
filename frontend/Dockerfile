@@ -8,28 +8,27 @@ RUN addgroup -g 1001 -S nodejs && \
     chown -R nodeuser:nodejs /app
 
 # Copy package files
-COPY package.json ./
+COPY package.json package-lock.json* ./
 
 # Install dependencies
 RUN npm install && \
+    npm install -g vite && \
     mkdir -p node_modules/.cache && \
     chmod -R 777 node_modules/.cache
 
 # Copy application code
 COPY . .
 
-# Build the app
-RUN npm run build
+# Update package.json dev script to include host flag
+RUN npm pkg set scripts.dev="vite --host"
 
-# Use a lightweight nginx image to serve the static files
-FROM nginx:alpine
+# Switch to non-root user
+USER nodeuser
 
-# Copy the built app from the previous stage
-COPY --from=0 /app/dist /usr/share/nginx/html
+RUN chmod 777 vite.config.*
 
-# Configure nginx
-COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+# Expose the port that Vite uses by default
+EXPOSE 3000
 
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+# Use npm run dev
+CMD ["npm", "run", "dev"]
