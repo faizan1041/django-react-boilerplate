@@ -14,20 +14,21 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkLoggedIn = async () => {
       try {
-        const token = localStorage.getItem('authToken');
+        const token = localStorage.getItem('accessToken');
         
         if (token) {
           // Set the token in the API headers
           api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
           
           // Get user data
-          const response = await api.get('/auth/me');
+          const response = await api.get('/auth/users/me/');
           setCurrentUser(response.data);
         }
       } catch (err) {
         console.error('Authentication check failed:', err);
         // Clear any invalid tokens
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
       } finally {
         setLoading(false);
       }
@@ -40,20 +41,29 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     setError(null);
     try {
-      const response = await api.post('/auth/login', { email, password });
-      const { token, user } = response.data;
+      // First get the JWT tokens
+      const tokenResponse = await api.post('/auth/jwt/create/', { email, password });
       
-      // Store the token in localStorage
-      localStorage.setItem('authToken', token);
+      // The response contains access and refresh tokens
+      const { access, refresh } = tokenResponse.data;
+      
+      // Store tokens in localStorage
+      localStorage.setItem('accessToken', access);
+      localStorage.setItem('refreshToken', refresh);
       
       // Set the token in the API headers
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      api.defaults.headers.common['Authorization'] = `Bearer ${access}`;
       
-      // Update the current user
-      setCurrentUser(user);
-      return user;
+      // Now fetch the user data
+      const userResponse = await api.get('/auth/users/me/');
+      const userData = userResponse.data;
+      
+      // Update the current user state
+      setCurrentUser(userData);
+      return userData;
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      console.error('Login error details:', err.response?.data);
+      setError(err.response?.data?.detail || 'Login failed');
       throw err;
     }
   };
@@ -62,17 +72,18 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     setError(null);
     try {
-      const response = await api.post('/auth/register', userData);
+      const response = await api.post('/auth/users/', userData);
       return response.data;
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      setError(err.response?.data || 'Registration failed');
       throw err;
     }
   };
 
   // Logout function
   const logout = () => {
-    localStorage.removeItem('authToken');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
     delete api.defaults.headers.common['Authorization'];
     setCurrentUser(null);
   };
