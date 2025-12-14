@@ -36,9 +36,9 @@ services:
     command: npm run dev
 
   db:
-    image: postgres:13
+    image: postgres:17
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - ../docker/postgres_data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
@@ -47,6 +47,5 @@ services:
       - "5432:5432"
 
 volumes:
-  postgres_data:
   backend-node-modules:
   frontend-node-modules:
